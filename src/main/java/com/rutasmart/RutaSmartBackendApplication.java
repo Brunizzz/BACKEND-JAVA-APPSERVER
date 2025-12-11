@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling // Importante para que el simulador GPS funcione
+@EnableScheduling
 public class RutaSmartBackendApplication {
     public static void main(String[] args) {
         SpringApplication.run(RutaSmartBackendApplication.class, args);

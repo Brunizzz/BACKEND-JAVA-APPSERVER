@@ -33,21 +33,18 @@ public class AuthController {
                 respuesta.put("error", "DB no encontrada");
                 return respuesta;
             }
-
             var publicKey = crypto.getPublic("KeyPair/publicKey"); 
             byte[] bytesCifrados = Files.readAllBytes(file.toPath());
             String jsonLimpio = crypto.decryptText(new String(bytesCifrados), publicKey);
-
             List<Map<String, Object>> usuarios = mapper.readValue(jsonLimpio, new TypeReference<List<Map<String, Object>>>(){});
 
             for (Map<String, Object> u : usuarios) {
                 String uName = String.valueOf(u.get("username"));
                 String uPass = String.valueOf(u.get("password"));
-
                 if (uName.equals(userIngresado) && uPass.equals(passIngresado)) {
                     respuesta.put("success", true);
                     respuesta.put("user", u);
-                    respuesta.put("token", "jwt-token-simulado-123");
+                    respuesta.put("token", "jwt-token-123");
                     return respuesta;
                 }
             }

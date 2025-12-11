@@ -33,28 +33,21 @@ public class SimulationService {
         try {
             File file = new File(RUTA_NFS + "buses.json");
             if (!file.exists()) return;
-            
             var key = ac.getPublic("KeyPair/publicKey");
             byte[] bytes = Files.readAllBytes(file.toPath());
             String json = ac.decryptText(new String(bytes), key);
             List<Map<String, Object>> combis = mapper.readValue(json, new TypeReference<List<Map<String, Object>>>(){});
             
             if (combis.isEmpty()) { controller.procesar("bus_live_location.json", "[]"); return; }
-
             List<Map<String, Object>> flota = new ArrayList<>();
-
             for (Map<String, Object> bus : combis) {
                 if ("Inactivo".equalsIgnoreCase((String)bus.get("status"))) continue;
-
                 String id = (String) bus.get("id");
                 String routeId = bus.containsKey("routeId") ? (String)bus.get("routeId") : "R-01";
-                
                 double[][] ruta = "R-01".equals(routeId) ? PATH_R01 : ("R-20".equals(routeId) ? PATH_R20 : PATH_GENERICO);
-                
                 int idx = busIndices.getOrDefault(id, 0);
                 idx = (idx + 1) % ruta.length;
                 busIndices.put(id, idx);
-
                 Map<String, Object> vivo = new HashMap<>();
                 vivo.put("busId", id);
                 vivo.put("lat", ruta[idx][0]);

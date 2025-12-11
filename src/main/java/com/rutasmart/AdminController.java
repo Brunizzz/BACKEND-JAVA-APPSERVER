@@ -29,7 +29,6 @@ public class AdminController {
         this.ac = new AsymmetricCryptography();
     }
 
-    // --- DASHBOARD ---
     @GetMapping("/status")
     public Map<String, String> getSystemStatus() {
         Map<String, String> status = new HashMap<>();
@@ -62,7 +61,6 @@ public class AdminController {
         } catch (Exception e) { return "Error: " + e.getMessage(); }
     }
 
-    // --- SEEDER ---
     @PostMapping("/seed-db")
     public String seedDatabase() {
         try {
@@ -78,12 +76,10 @@ public class AdminController {
             List<Map<String, Object>> users = new ArrayList<>();
             users.add(Map.of("id", 1, "username", "admin", "password", "admin123", "email", "admin@rutasmart.mx", "rol", "Super Admin", "ultimo_acceso", "2025-12-08"));
             mainController.procesar("users.json", mapper.writeValueAsString(users));
-
             return "Base de datos NFS poblada correctamente.";
         } catch (Exception e) { return "Error: " + e.getMessage(); }
     }
 
-    // --- HELPER DE LECTURA ---
     private List<Map<String, Object>> leerArchivoGenerico(String nombreArchivo) {
         try {
             File file = new File(RUTA_NFS + nombreArchivo);
@@ -95,12 +91,10 @@ public class AdminController {
         } catch (Exception e) { return new ArrayList<>(); }
     }
 
-    // --- GETTERS ---
     @GetMapping("/buses") public List<Map<String, Object>> getBuses() { return leerArchivoGenerico("buses.json"); }
     @GetMapping("/routes") public List<Map<String, Object>> getRoutes() { return leerArchivoGenerico("routes.json"); }
     @GetMapping("/users") public List<Map<String, Object>> getUsers() { return leerArchivoGenerico("users.json"); }
 
-    // --- CRUD BUSES ---
     @PostMapping("/buses/add")
     public String addBus(@RequestBody Map<String, Object> item) throws Exception {
         List<Map<String, Object>> items = leerArchivoGenerico("buses.json");
@@ -128,7 +122,6 @@ public class AdminController {
         return "OK";
     }
 
-    // --- CRUD RUTAS (Simplificado para brevedad, sigue misma lógica) ---
     @PostMapping("/routes/add")
     public String addRoute(@RequestBody Map<String, Object> item) throws Exception {
         List<Map<String, Object>> items = leerArchivoGenerico("routes.json");
@@ -136,9 +129,26 @@ public class AdminController {
         mainController.procesar("routes.json", mapper.writeValueAsString(items));
         return "OK";
     }
-    // ... (Métodos update y delete de rutas iguales a buses)
+    @PutMapping("/routes/update/{id}")
+    public String updateRoute(@PathVariable String id, @RequestBody Map<String, Object> itemData) throws Exception {
+        List<Map<String, Object>> items = leerArchivoGenerico("routes.json");
+        for (int i = 0; i < items.size(); i++) {
+            if (String.valueOf(items.get(i).get("id")).equals(id)) {
+                items.set(i, itemData);
+                mainController.procesar("routes.json", mapper.writeValueAsString(items));
+                return "OK";
+            }
+        }
+        return "Error";
+    }
+    @DeleteMapping("/routes/delete/{id}")
+    public String deleteRoute(@PathVariable String id) throws Exception {
+        List<Map<String, Object>> items = leerArchivoGenerico("routes.json");
+        items.removeIf(r -> String.valueOf(r.get("id")).equals(id));
+        mainController.procesar("routes.json", mapper.writeValueAsString(items));
+        return "OK";
+    }
 
-    // --- CRUD USUARIOS ---
     @PostMapping("/users/add")
     public String addUser(@RequestBody Map<String, Object> item) throws Exception {
         List<Map<String, Object>> items = leerArchivoGenerico("users.json");
@@ -146,5 +156,23 @@ public class AdminController {
         mainController.procesar("users.json", mapper.writeValueAsString(items));
         return "OK";
     }
-    // ... (Métodos update y delete de users iguales a buses)
+    @PutMapping("/users/update/{id}")
+    public String updateUser(@PathVariable String id, @RequestBody Map<String, Object> itemData) throws Exception {
+        List<Map<String, Object>> items = leerArchivoGenerico("users.json");
+        for (int i = 0; i < items.size(); i++) {
+            if (String.valueOf(items.get(i).get("id")).equals(id)) {
+                items.set(i, itemData);
+                mainController.procesar("users.json", mapper.writeValueAsString(items));
+                return "OK";
+            }
+        }
+        return "Error";
+    }
+    @DeleteMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable String id) throws Exception {
+        List<Map<String, Object>> items = leerArchivoGenerico("users.json");
+        items.removeIf(u -> String.valueOf(u.get("id")).equals(id));
+        mainController.procesar("users.json", mapper.writeValueAsString(items));
+        return "OK";
+    }
 }
